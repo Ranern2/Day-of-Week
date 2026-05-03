@@ -11,10 +11,12 @@ int calculatemonthCode(int month);
 int calculateWeekday(int day, int month, int year);
 int dayOfWeek(int day, int month, int year);
 void runQuiz();
+void runCustomGuess();
 int main() {
     cout << "Select mode:\n";
     cout << "  1. Enter a date\n";
     cout << "  2. Quiz - guess the day of the week\n";
+    cout << "  3. Custom guess - input your own date and guess\n";
     cout << "Choice: ";
     int choice = 0;
     cin >> choice;
@@ -22,6 +24,11 @@ int main() {
 
     if (choice == 2) {
         runQuiz();
+        return 0;
+    }
+
+    if (choice == 3) {
+        runCustomGuess();
         return 0;
     }
 
@@ -128,6 +135,50 @@ void runQuiz() {
 
     cout << "\nQuiz date: " << day << "-" << month << "-" << year << "\n";
     cout << "What day of the week is this? (or press Enter to skip): ";
+
+    string input;
+    getline(cin, input);
+
+    if (input.empty()) {
+        cout << "Skipped. ";
+    } else {
+        int correct = calculateWeekday(day, month, year);
+        // Case-insensitive compare
+        string lower = input;
+        for (char& c : lower) c = static_cast<char>(tolower(c));
+        string correctLower = dayNames[correct];
+        for (char& c : correctLower) c = static_cast<char>(tolower(c));
+
+        if (lower == correctLower) {
+            cout << "Correct! ";
+        } else {
+            cout << "Wrong. ";
+        }
+    }
+
+    cout << "The answer is: " << dayNames[calculateWeekday(day, month, year)] << "\n";
+}
+
+void runCustomGuess() {
+    int day = 0;
+    int month = 0;
+    int year = 0;
+    char dash1 = '\0';
+    char dash2 = '\0';
+
+    cout << "Enter date (DD-MM-YYYY): ";
+    if (!(cin >> day >> dash1 >> month >> dash2 >> year) || dash1 != '-' || dash2 != '-') {
+        cerr << "Invalid format. Use DD-MM-YYYY.\n";
+        return;
+    }
+
+    if (validateInput(day, month, year) != 0) {
+        return;
+    }
+
+    const char* dayNames[] = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+
+    cout << "\nWhat day of the week is " << day << "-" << month << "-" << year << "? (or press Enter to skip): ";
 
     string input;
     getline(cin, input);

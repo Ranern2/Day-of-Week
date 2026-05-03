@@ -231,7 +231,7 @@
   <main class="wrap">
     <section class="hero">
       <h1>Day of Week Trainer</h1>
-      <p class="sub">Practice mental day-of-week skills or quickly check a date between 1753 and 2099.</p>
+      <p class="sub">Practice mental day-of-week skills with quizzes or custom dates, or quickly check a date between 1753 and 2099.</p>
       <div class="hero-actions">
         <button class="secondary" id="installBtn" hidden>Install App</button>
       </div>
@@ -248,6 +248,28 @@
           <button class="ghost" id="clearBtn">Clear</button>
         </div>
         <div class="result" id="lookupResult"></div>
+      </article>
+
+      <article class="card">
+        <h2>Guess Mode</h2>
+        <label for="guessDate">Enter date (DD-MM-YYYY)</label>
+        <input id="guessDate" type="text" placeholder="e.g. 03-05-2026" />
+        <label for="customGuessSelect">Your guess</label>
+        <select id="customGuessSelect">
+          <option value="">Select a day</option>
+          <option>Sunday</option>
+          <option>Monday</option>
+          <option>Tuesday</option>
+          <option>Wednesday</option>
+          <option>Thursday</option>
+          <option>Friday</option>
+          <option>Saturday</option>
+        </select>
+        <div class="actions">
+          <button class="primary" id="customCheckBtn">Check Guess</button>
+          <button class="ghost" id="customClearBtn">Clear</button>
+        </div>
+        <div class="result" id="customResult"></div>
       </article>
 
       <article class="card">
@@ -283,12 +305,11 @@
   <script>
     const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-    const lookupDateInput = document.getElementById("lookupDate");
-    const lookupResult = document.getElementById("lookupResult");
-    const findBtn = document.getElementById("findBtn");
-    const clearBtn = document.getElementById("clearBtn");
-    const installBtn = document.getElementById("installBtn");
-    const installStatus = document.getElementById("installStatus");
+    const guessDateInput = document.getElementById("guessDate");
+    const customGuessSelect = document.getElementById("customGuessSelect");
+    const customCheckBtn = document.getElementById("customCheckBtn");
+    const customClearBtn = document.getElementById("customClearBtn");
+    const customResult = document.getElementById("customResult");
 
     const quizDateText = document.getElementById("quizDate");
     const guessSelect = document.getElementById("guessSelect");
@@ -507,6 +528,45 @@
       lookupResult.className = "result";
       lookupResult.textContent = "";
       lookupResult.classList.remove("lookup-success", "lookup-error");
+    });
+
+    customCheckBtn.addEventListener("click", () => {
+      const parsed = parseDDMMYYYY(guessDateInput.value);
+      if (!parsed) {
+        customResult.className = "result bad";
+        customResult.textContent = "Invalid format. Use DD-MM-YYYY.";
+        return;
+      }
+
+      const err = validateDate(parsed.day, parsed.month, parsed.year);
+      if (err) {
+        customResult.className = "result bad";
+        customResult.textContent = err;
+        return;
+      }
+
+      const guess = customGuessSelect.value;
+      if (!guess) {
+        customResult.className = "result bad";
+        customResult.textContent = "Please select a day for your guess.";
+        return;
+      }
+
+      const answer = days[getWeekday(parsed.day, parsed.month, parsed.year)];
+      if (guess === answer) {
+        customResult.className = "result ok";
+        customResult.textContent = "Correct! The day is " + answer + ".";
+      } else {
+        customResult.className = "result bad";
+        customResult.textContent = "Not quite. The day is " + answer + ".";
+      }
+    });
+
+    customClearBtn.addEventListener("click", () => {
+      guessDateInput.value = "";
+      customGuessSelect.value = "";
+      customResult.className = "result";
+      customResult.textContent = "";
     });
 
     window.addEventListener("beforeinstallprompt", (event) => {
