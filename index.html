@@ -254,6 +254,7 @@
         <h2>Guess Mode</h2>
         <label for="guessDate">Enter date (DD-MM-YYYY)</label>
         <input id="guessDate" type="text" placeholder="e.g. 03-05-2026" />
+        <p class="quiz-stopwatch" id="guessStopwatch">Time: --</p>
         <label for="customGuessSelect">Your guess</label>
         <select id="customGuessSelect">
           <option value="">Select a day</option>
@@ -266,6 +267,7 @@
           <option>Saturday</option>
         </select>
         <div class="actions">
+          <button class="secondary" id="customStartBtn">Start Timer</button>
           <button class="primary" id="customCheckBtn">Check Guess</button>
           <button class="ghost" id="customClearBtn">Clear</button>
         </div>
@@ -300,6 +302,17 @@
         <div class="result" id="quizResult"></div>
       </article>
     </section>
+
+    <section class="card tutorial-card">
+      <h2>How It Works</h2>
+      <p>This app teaches day-of-week calculation with three modes:</p>
+      <ul>
+        <li><strong>Date Lookup</strong>: enter any date and get the weekday instantly.</li>
+        <li><strong>Guess Mode</strong>: enter your own date, start the timer, guess the weekday, and then check your answer.</li>
+        <li><strong>Quiz Mode</strong>: press New Quiz for a random date, choose the weekday, and track score over time.</li>
+      </ul>
+      <p>Use the timer in Guess Mode to practice speed as well as accuracy. The app validates dates between 1753 and 2099.</p>
+    </section>
   </main>
 
   <script>
@@ -320,7 +333,14 @@
     const quizResult = document.getElementById("quizResult");
     const quizStopwatch = document.getElementById("quizStopwatch");
 
+    const customStartBtn = document.getElementById("customStartBtn");
+    const guessStopwatch = document.getElementById("guessStopwatch");
+
     let currentQuiz = null;
+    let guessStartedAt = null;
+    let guessStopwatchId = null;
+    let guessLastElapsedMs = 0;
+
     let quizStartedAt = null;
     let stopwatchId = null;
     let lastElapsedMs = 0;
@@ -380,6 +400,42 @@
 
       const elapsed = Date.now() - quizStartedAt;
       quizStopwatch.textContent = "Time: " + formatElapsed(elapsed);
+    }
+
+    function updateGuessStopwatch() {
+      if (guessStartedAt === null) {
+        guessStopwatch.textContent = "Time: --";
+        return;
+      }
+
+      const elapsed = Date.now() - guessStartedAt;
+      guessStopwatch.textContent = "Time: " + formatElapsed(elapsed);
+    }
+
+    function startGuessStopwatch() {
+      if (guessStopwatchId !== null) {
+        clearInterval(guessStopwatchId);
+      }
+      guessStartedAt = Date.now();
+      guessLastElapsedMs = 0;
+      updateGuessStopwatch();
+      guessStopwatchId = setInterval(updateGuessStopwatch, 100);
+    }
+
+    function stopGuessStopwatch() {
+      if (guessStartedAt !== null) {
+        guessLastElapsedMs = Date.now() - guessStartedAt;
+      }
+      if (guessStopwatchId !== null) {
+        clearInterval(guessStopwatchId);
+        guessStopwatchId = null;
+      }
+      guessStartedAt = null;
+      if (guessLastElapsedMs > 0) {
+        guessStopwatch.textContent = "Time: " + formatElapsed(guessLastElapsedMs);
+      } else {
+        guessStopwatch.textContent = "Time: --";
+      }
     }
 
     function startStopwatch() {
@@ -545,6 +601,11 @@
         return;
       }
 
+      if (guessStartedAt !== null) {
+        stopGuessStopwatch();
+      }
+
+      const elapsedText = guessLastElapsedMs > 0 ? formatElapsed(guessLastElapsedMs) : "not started";
       const guess = customGuessSelect.value;
       if (!guess) {
         customResult.className = "result bad";
@@ -555,10 +616,10 @@
       const answer = days[getWeekday(parsed.day, parsed.month, parsed.year)];
       if (guess === answer) {
         customResult.className = "result ok";
-        customResult.textContent = "Correct! The day is " + answer + ".";
+        customResult.textContent = "Correct! The day is " + answer + ". | Time: " + elapsedText;
       } else {
         customResult.className = "result bad";
-        customResult.textContent = "Not quite. The day is " + answer + ".";
+        customResult.textContent = "Not quite. The day is " + answer + ". | Time: " + elapsedText;
       }
     });
 
@@ -567,6 +628,15 @@
       customGuessSelect.value = "";
       customResult.className = "result";
       customResult.textContent = "";
+      stopGuessStopwatch();
+      guessLastElapsedMs = 0;
+      guessStopwatch.textContent = "Time: --";
+    });
+
+    customStartBtn.addEventListener("click", () => {
+      startGuessStopwatch();
+      customResult.className = "result";
+      customResult.textContent = "Timer started. Enter your guess and press Check Guess.";
     });
 
     window.addEventListener("beforeinstallprompt", (event) => {
