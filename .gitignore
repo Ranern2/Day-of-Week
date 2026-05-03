@@ -1,0 +1,12 @@
+# Ignore compiled binaries and build artifacts
+*.exe
+*.obj
+*.ilk
+*.pdb
+*.log
+
+# Ignore Visual Studio temporary files
+.vscode/
+
+# Ignore Node artifacts if any
+node_modules/

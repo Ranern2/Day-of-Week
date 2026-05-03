@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1f8a70" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+  <title>Day of Week Trainer</title>
+  <style>
+    :root {
+      --bg-top: #f3efe2;
+      --bg-bottom: #d9ecff;
+      --ink: #1c2430;
+      --muted: #5a6473;
+      --card: #fffdfa;
+      --accent: #1f8a70;
+      --accent-2: #ff7a45;
+      --line: #d9d7cf;
+      --ok: #157347;
+      --bad: #9f1239;
+      --shadow: 0 16px 30px rgba(27, 38, 52, 0.12);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
+      background-attachment: fixed;
+    }
+
+    .wrap {
+      width: min(980px, 92vw);
+      margin: 36px auto;
+      display: grid;
+      gap: 20px;
+    }
+
+    .hero {
+      background: radial-gradient(circle at 8% 10%, #ffffff 0%, #fff6ea 44%, #fff 100%);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      animation: rise 500ms ease-out;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      letter-spacing: 0.3px;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .hero-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hero-note {
+      margin: 8px 0 0;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      animation: rise 650ms ease-out;
+    }
+
+    .card h2 {
+      margin: 2px 0 12px;
+      font-size: 1.15rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #c7cbd4;
+      border-radius: 12px;
+      font-size: 1rem;
+      background: white;
+    }
+
+    .row {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .actions {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .secondary {
+      background: var(--accent-2);
+      color: white;
+    }
+
+    .ghost {
+      background: #eef2f7;
+      color: #223;
+    }
+
+    .result {
+      margin-top: 14px;
+      border-top: 1px dashed var(--line);
+      padding-top: 10px;
+      min-height: 48px;
+      line-height: 1.45;
+    }
+
+    .lookup-success {
+      animation: successPop 520ms ease-out;
+    }
+
+    .lookup-error {
+      animation: errorShake 360ms ease-in-out;
+    }
+
+    .ok { color: var(--ok); }
+    .bad { color: var(--bad); }
+
+    .quiz-date {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      margin: 2px 0 10px;
+    }
+
+    .quiz-stopwatch {
+      margin: 0 0 10px;
+      font-weight: 700;
+      color: #153c57;
+    }
+
+    .quiz-stats {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f7fbff;
+      color: #24435b;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    @keyframes rise {
+      from {
+        transform: translateY(10px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes successPop {
+      0% {
+        transform: scale(0.98);
+        text-shadow: 0 0 0 rgba(21, 115, 71, 0);
+      }
+      45% {
+        transform: scale(1.02);
+        text-shadow: 0 0 12px rgba(21, 115, 71, 0.35);
+      }
+      100% {
+        transform: scale(1);
+        text-shadow: 0 0 0 rgba(21, 115, 71, 0);
+      }
+    }
+
+    @keyframes errorShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-5px); }
+      40% { transform: translateX(5px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <h1>Day of Week Trainer</h1>
+      <p class="sub">Practice mental day-of-week skills or quickly check a date between 1753 and 2099.</p>
+      <div class="hero-actions">
+        <button class="secondary" id="installBtn" hidden>Install App</button>
+      </div>
+      <p class="hero-note" id="installStatus">Install available on supported browsers.</p>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Date Lookup</h2>
+        <label for="lookupDate">Enter date (DD-MM-YYYY)</label>
+        <input id="lookupDate" type="text" placeholder="e.g. 03-05-2026" />
+        <div class="actions">
+          <button class="primary" id="findBtn">Find Day</button>
+          <button class="ghost" id="clearBtn">Clear</button>
+        </div>
+        <div class="result" id="lookupResult"></div>
+      </article>
+
+      <article class="card">
+        <h2>Quiz Mode</h2>
+        <p class="quiz-date" id="quizDate">Press New Quiz</p>
+        <p class="quiz-stopwatch" id="quizStopwatch">Time: --</p>
+        <label for="quizDifficulty">Difficulty</label>
+        <select id="quizDifficulty">
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+        <label for="guessSelect">Your guess</label>
+        <select id="guessSelect">
+          <option value="">Select a day (optional)</option>
+          <option>Sunday</option>
+          <option>Monday</option>
+          <option>Tuesday</option>
+          <option>Wednesday</option>
+          <option>Thursday</option>
+          <option>Friday</option>
+          <option>Saturday</option>
+        </select>
+        <div class="actions">
+          <button class="secondary" id="newQuizBtn">New Quiz</button>
+          <button class="primary" id="checkBtn">Check / Reveal</button>
+        </div>
+        <div class="quiz-stats" id="quizStats">Score - Correct: 0 | Wrong: 0 | Skipped: 0 | Streak: 0 | Best: 0</div>
+        <div class="result" id="quizResult"></div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    const lookupDateInput = document.getElementById("lookupDate");
+    const lookupResult = document.getElementById("lookupResult");
+    const findBtn = document.getElementById("findBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const installBtn = document.getElementById("installBtn");
+    const installStatus = document.getElementById("installStatus");
+
+    const quizDateText = document.getElementById("quizDate");
+    const guessSelect = document.getElementById("guessSelect");
+    const quizDifficulty = document.getElementById("quizDifficulty");
+    const newQuizBtn = document.getElementById("newQuizBtn");
+    const checkBtn = document.getElementById("checkBtn");
+    const quizStats = document.getElementById("quizStats");
+    const quizResult = document.getElementById("quizResult");
+    const quizStopwatch = document.getElementById("quizStopwatch");
+
+    let currentQuiz = null;
+    let quizStartedAt = null;
+    let stopwatchId = null;
+    let lastElapsedMs = 0;
+    let quizResolved = false;
+    let installPromptEvent = null;
+    const SCORE_STORAGE_KEY = "dayOfWeekTrainerScore";
+
+    const score = {
+      correct: 0,
+      wrong: 0,
+      skipped: 0,
+      streak: 0,
+      bestStreak: 0
+    };
+
+    function saveScore() {
+      localStorage.setItem(SCORE_STORAGE_KEY, JSON.stringify(score));
+    }
+
+    function loadScore() {
+      const raw = localStorage.getItem(SCORE_STORAGE_KEY);
+      if (!raw) return;
+
+      try {
+        const parsed = JSON.parse(raw);
+        if (typeof parsed !== "object" || parsed === null) return;
+        score.correct = Number(parsed.correct) || 0;
+        score.wrong = Number(parsed.wrong) || 0;
+        score.skipped = Number(parsed.skipped) || 0;
+        score.streak = Number(parsed.streak) || 0;
+        score.bestStreak = Number(parsed.bestStreak) || 0;
+      } catch (err) {
+        // Ignore invalid saved score values and keep defaults.
+      }
+    }
+
+    function updateStats() {
+      quizStats.textContent =
+        "Score - Correct: " + score.correct +
+        " | Wrong: " + score.wrong +
+        " | Skipped: " + score.skipped +
+        " | Streak: " + score.streak +
+        " | Best: " + score.bestStreak;
+      saveScore();
+    }
+
+    function formatElapsed(ms) {
+      const seconds = (ms / 1000).toFixed(1);
+      return seconds + "s";
+    }
+
+    function updateStopwatch() {
+      if (quizStartedAt === null) {
+        quizStopwatch.textContent = "Time: --";
+        return;
+      }
+
+      const elapsed = Date.now() - quizStartedAt;
+      quizStopwatch.textContent = "Time: " + formatElapsed(elapsed);
+    }
+
+    function startStopwatch() {
+      if (stopwatchId !== null) {
+        clearInterval(stopwatchId);
+      }
+
+      quizStartedAt = Date.now();
+      lastElapsedMs = 0;
+      updateStopwatch();
+      stopwatchId = setInterval(updateStopwatch, 100);
+    }
+
+    function stopStopwatch() {
+      if (quizStartedAt !== null) {
+        lastElapsedMs = Date.now() - quizStartedAt;
+      }
+
+      if (stopwatchId !== null) {
+        clearInterval(stopwatchId);
+        stopwatchId = null;
+      }
+
+      if (quizStartedAt !== null) {
+        quizStopwatch.textContent = "Time: " + formatElapsed(lastElapsedMs);
+      }
+    }
+
+    function isLeapYear(year) {
+      return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+    }
+
+    function maxDayForMonth(month, year) {
+      if (month === 2) return isLeapYear(year) ? 29 : 28;
+      if ([4, 6, 9, 11].includes(month)) return 30;
+      return 31;
+    }
+
+    function validateDate(day, month, year) {
+      if (!Number.isInteger(day) || !Number.isInteger(month) || !Number.isInteger(year)) {
+        return "Date must be numeric.";
+      }
+      if (year < 1753 || year > 2099) {
+        return "Year must be between 1753 and 2099.";
+      }
+      if (month < 1 || month > 12) {
+        return "Month must be between 1 and 12.";
+      }
+      const maxDay = maxDayForMonth(month, year);
+      if (day < 1 || day > maxDay) {
+        return "Day must be between 1 and " + maxDay + " for that month.";
+      }
+      return null;
+    }
+
+    function getWeekday(day, month, year) {
+      return new Date(year, month - 1, day).getDay();
+    }
+
+    function parseDDMMYYYY(value) {
+      const m = value.trim().match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+      if (!m) return null;
+      return { day: Number(m[1]), month: Number(m[2]), year: Number(m[3]) };
+    }
+
+    function formatDate(d) {
+      const dd = String(d.day).padStart(2, "0");
+      const mm = String(d.month).padStart(2, "0");
+      return dd + "-" + mm + "-" + d.year;
+    }
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function makeRandomValidDate(minYear, maxYear) {
+      const year = randomInt(minYear, maxYear);
+      const month = randomInt(1, 12);
+      const day = randomInt(1, maxDayForMonth(month, year));
+      return { day, month, year };
+    }
+
+    function makeHardDate() {
+      const roll = Math.random();
+
+      if (roll < 0.4) {
+        const year = randomInt(1753, 2099);
+        const month = randomInt(2, 3);
+        const candidates = month === 2 ? [27, 28, 29] : [1, 2, 3];
+        const valid = candidates.filter((d) => d <= maxDayForMonth(month, year));
+        const day = valid[randomInt(0, valid.length - 1)];
+        return { day, month, year };
+      }
+
+      if (roll < 0.75) {
+        const year = randomInt(1753, 2099);
+        const month = [1, 3, 4, 6, 9, 11, 12][randomInt(0, 6)];
+        const maxDay = maxDayForMonth(month, year);
+        const candidates = [maxDay - 1, maxDay].filter((d) => d >= 1);
+        const day = candidates[randomInt(0, candidates.length - 1)];
+        return { day, month, year };
+      }
+
+      return makeRandomValidDate(1753, 2099);
+    }
+
+    function nextQuizDate() {
+      if (quizDifficulty.value === "hard") {
+        return makeHardDate();
+      }
+      return makeRandomValidDate(1900, 2099);
+    }
+
+    function playLookupEffect(type) {
+      lookupResult.classList.remove("lookup-success", "lookup-error");
+      // Force reflow so animation can replay on repeated clicks.
+      void lookupResult.offsetWidth;
+      lookupResult.classList.add(type === "success" ? "lookup-success" : "lookup-error");
+    }
+
+    findBtn.addEventListener("click", () => {
+      const parsed = parseDDMMYYYY(lookupDateInput.value);
+      if (!parsed) {
+        lookupResult.className = "result bad";
+        lookupResult.textContent = "Invalid format. Use DD-MM-YYYY.";
+        playLookupEffect("error");
+        return;
+      }
+
+      const err = validateDate(parsed.day, parsed.month, parsed.year);
+      if (err) {
+        lookupResult.className = "result bad";
+        lookupResult.textContent = err;
+        playLookupEffect("error");
+        return;
+      }
+
+      const weekday = days[getWeekday(parsed.day, parsed.month, parsed.year)];
+      lookupResult.className = "result ok";
+      lookupResult.textContent = "The day of the week is " + weekday + ".";
+      playLookupEffect("success");
+    });
+
+    clearBtn.addEventListener("click", () => {
+      lookupDateInput.value = "";
+      lookupResult.className = "result";
+      lookupResult.textContent = "";
+      lookupResult.classList.remove("lookup-success", "lookup-error");
+    });
+
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      installPromptEvent = event;
+      installBtn.hidden = false;
+      installStatus.textContent = "Tap Install App for home-screen install.";
+    });
+
+    installBtn.addEventListener("click", async () => {
+      if (!installPromptEvent) {
+        installStatus.textContent = "Install is not available on this browser yet.";
+        return;
+      }
+
+      installPromptEvent.prompt();
+      const choiceResult = await installPromptEvent.userChoice;
+      if (choiceResult.outcome === "accepted") {
+        installStatus.textContent = "App installed. You can launch it from your home screen.";
+        installBtn.hidden = true;
+      } else {
+        installStatus.textContent = "Install dismissed. You can try again anytime.";
+      }
+
+      installPromptEvent = null;
+    });
+
+    window.addEventListener("appinstalled", () => {
+      installStatus.textContent = "App installed successfully.";
+      installBtn.hidden = true;
+      installPromptEvent = null;
+    });
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js")
+          .then(() => {
+            installStatus.textContent = "Offline mode ready once loaded at least once.";
+          })
+          .catch(() => {
+            installStatus.textContent = "Offline mode unavailable on this browser.";
+          });
+      });
+    }
+
+    newQuizBtn.addEventListener("click", () => {
+      currentQuiz = nextQuizDate();
+      quizResolved = false;
+      quizDateText.textContent = formatDate(currentQuiz);
+      guessSelect.value = "";
+      quizResult.className = "result";
+      quizResult.textContent = "Guess if you want, then press Check / Reveal.";
+      startStopwatch();
+    });
+
+    checkBtn.addEventListener("click", () => {
+      if (!currentQuiz) {
+        quizResult.className = "result bad";
+        quizResult.textContent = "Press New Quiz first.";
+        return;
+      }
+
+      if (quizResolved) {
+        quizResult.className = "result";
+        quizResult.textContent = "This round is already scored. Press New Quiz.";
+        return;
+      }
+
+      stopStopwatch();
+      const elapsedText = formatElapsed(lastElapsedMs);
+
+      const answer = days[getWeekday(currentQuiz.day, currentQuiz.month, currentQuiz.year)];
+      const guess = guessSelect.value;
+
+      if (!guess) {
+        score.skipped += 1;
+        score.streak = 0;
+        updateStats();
+        quizResolved = true;
+        quizResult.className = "result";
+        quizResult.textContent = "Answer: " + answer + " | Time: " + elapsedText;
+        return;
+      }
+
+      if (guess === answer) {
+        score.correct += 1;
+        score.streak += 1;
+        if (score.streak > score.bestStreak) {
+          score.bestStreak = score.streak;
+        }
+        updateStats();
+        quizResolved = true;
+        quizResult.className = "result ok";
+        quizResult.textContent = "Correct. Answer: " + answer + " | Time: " + elapsedText;
+      } else {
+        score.wrong += 1;
+        score.streak = 0;
+        updateStats();
+        quizResolved = true;
+        quizResult.className = "result bad";
+        quizResult.textContent = "Not quite. Answer: " + answer + " | Time: " + elapsedText;
+      }
+    });
+
+    loadScore();
+    updateStats();
+    updateStopwatch();
+  </script>
+</body>
+</html>
