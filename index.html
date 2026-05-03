@@ -44,24 +44,54 @@
     }
 
     .hero {
-      background: radial-gradient(circle at 8% 10%, #ffffff 0%, #fff6ea 44%, #fff 100%);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 22px;
-      box-shadow: var(--shadow);
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.95), rgba(255,255,255,0.70) 35%, rgba(255,255,255,0.54) 100%);
+      border: 1px solid rgba(255,255,255,0.65);
+      border-radius: calc(var(--radius) * 1.2);
+      padding: 32px 26px 26px;
+      box-shadow: 0 24px 60px rgba(27, 38, 52, 0.16);
       animation: rise 500ms ease-out;
+      display: grid;
+      justify-items: center;
+      gap: 18px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(31, 138, 112, 0.12);
+      color: var(--accent);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .brand-logo {
+      width: 76px;
+      height: 76px;
+      border-radius: 24px;
+      border: 1px solid rgba(28, 36, 48, 0.08);
+      background: white;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.75);
     }
 
     h1 {
-      margin: 0 0 6px;
-      letter-spacing: 0.3px;
-      font-size: clamp(1.5rem, 3vw, 2rem);
+      margin: 0;
+      letter-spacing: 0.2px;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      max-width: 720px;
+      line-height: 1.05;
     }
 
     .sub {
       margin: 0;
       color: var(--muted);
-      font-size: 0.98rem;
+      font-size: 1rem;
+      max-width: 720px;
+      line-height: 1.7;
     }
 
     .hero-actions {
@@ -84,12 +114,20 @@
     }
 
     .card {
-      border: 1px solid var(--line);
+      border: 1px solid rgba(255, 255, 255, 0.8);
       border-radius: var(--radius);
-      background: var(--card);
-      box-shadow: var(--shadow);
-      padding: 18px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 20px 40px rgba(27, 38, 52, 0.08);
+      padding: 22px;
       animation: rise 650ms ease-out;
+      backdrop-filter: blur(12px);
+    }
+
+    .tutorial-card {
+      grid-column: 1 / -1;
+      padding: 24px 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.88));
+      border-color: rgba(31, 138, 112, 0.16);
     }
 
     .card h2 {
@@ -230,8 +268,12 @@
 <body>
   <main class="wrap">
     <section class="hero">
-      <h1>Day of Week Trainer</h1>
-      <p class="sub">Practice mental day-of-week skills with quizzes or custom dates, or quickly check a date between 1753 and 2099.</p>
+      <div class="hero-badge">
+        <img src="icon.svg" alt="Day of Week Trainer logo" class="brand-logo" />
+        <span>Day-of-Week Trainer</span>
+      </div>
+      <h1>Build speed and confidence with weekday calculations.</h1>
+      <p class="sub">Use Lookup, Guess or Quiz mode to master date recall across years. A polished interface, guided tutorial and timer help you learn faster.</p>
       <div class="hero-actions">
         <button class="secondary" id="installBtn" hidden>Install App</button>
       </div>
